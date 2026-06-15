@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Procura Edge — Tender Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0f1e38;--navy2:#162847;--navy3:#1e3460;--gold:#c9a84c;--gold2:#e8c96e;--gold-light:#fdf6e3;--bg:#f4f6fa;--card:#fff;--border:#e2e6ed;--text:#1a2436;--muted:#6b7a95;--slate:#8a9ab5;--green:#1a9e6e;--red:#d94f3d;--orange:#c97a1a;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#gate{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.gate-box{background:rgba(255,255,255,0.05);backdrop-filter:blur(12px);border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:52px 44px;width:100%;max-width:420px;text-align:center;}
+.gate-emblem{width:64px;height:64px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;}
+.gate-logo{font-family:'DM Serif Display',serif;font-size:30px;color:#fff;line-height:1;}
+.gate-logo span{color:var(--gold);}
+.gate-tagline{color:var(--slate);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin:6px 0 36px;}
+.gate-label{display:block;text-align:left;font-size:11px;font-weight:600;color:var(--slate);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.gate-input{width:100%;padding:14px 16px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;letter-spacing:2px;}
+.gate-input:focus{border-color:var(--gold);}
+.gate-btn{margin-top:16px;width:100%;padding:15px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:15px;border:none;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.5px;}
+.gate-err{margin-top:12px;color:#ff9090;font-size:13px;min-height:18px;}
+header{background:var(--navy);height:66px;display:flex;align-items:center;padding:0 36px;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(201,168,76,0.15);}
+.h-logo{font-family:'DM Serif Display',serif;font-size:22px;color:#fff;display:flex;align-items:center;gap:10px;}
+.h-logo span{color:var(--gold);}
+.h-logo-dot{width:8px;height:8px;background:var(--gold);border-radius:50%;}
+.h-right{color:var(--slate);font-size:13px;}
+main{max-width:1160px;margin:0 auto;padding:40px 24px;}
+.section-header{margin-bottom:32px;}
+.section-header h1{font-family:'DM Serif Display',serif;font-size:30px;color:var(--navy);margin-bottom:4px;}
+.section-header p{color:var(--muted);font-size:14px;}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+.fbtn{padding:7px 18px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);transition:all 0.15s;font-family:'Inter',sans-serif;}
+.fbtn.active,.fbtn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tender-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;}
+.tcard{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:box-shadow 0.2s,transform 0.15s;display:flex;flex-direction:column;}
+.tcard:hover{box-shadow:0 12px 40px rgba(15,30,56,0.13);transform:translateY(-3px);}
+.tcard-top{padding:22px 22px 18px;flex:1;}
+.tcard-accent{height:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.tcard-meta-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sector-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:3px 10px;border-radius:4px;}
+.st-infra{background:#e8f0fe;color:#1a56db;}.st-health{background:#e8faf0;color:#1a7a4a;}.st-edu{background:#fff8e8;color:#a06b00;}.st-it{background:#f3e8ff;color:#7c3aed;}.st-water{background:#e0f5ff;color:#0277a8;}.st-energy{background:#fff3e0;color:#e65100;}.st-other{background:#f0f0f0;color:#555;}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+.s-open{background:var(--green);}.s-soon{background:var(--orange);}.s-closed{background:var(--red);}
+.status-label{font-size:12px;font-weight:600;}
+.sl-open{color:var(--green);}.sl-soon{color:var(--orange);}.sl-closed{color:var(--red);}
+.tcard-title{font-size:15px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:14px;}
+.tcard-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tci label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);display:block;margin-bottom:2px;}
+.tci span{font-size:13px;font-weight:500;color:var(--text);}
+.tci .cost{font-weight:700;color:var(--navy);}
+.tcard-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafbfc;}
+.tcard-loc{font-size:12px;color:var(--muted);}
+.view-btn{font-size:13px;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:4px;}
+.empty{text-align:center;padding:80px 20px;color:var(--muted);grid-column:1/-1;}
+.empty-icon{font-size:48px;margin-bottom:12px;}
+.empty h3{font-size:18px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.loading{grid-column:1/-1;text-align:center;padding:80px;color:var(--muted);}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.modal-bg{position:fixed;inset:0;background:rgba(8,18,36,0.72);z-index:500;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:740px;margin:auto;overflow:hidden;transform:translateY(24px);transition:transform 0.25s;}
+.modal-bg.open .modal{transform:translateY(0);}
+.mhead{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);padding:32px 36px 28px;position:relative;}
+.mhead-tag{margin-bottom:10px;}
+.mhead-title{font-family:'DM Serif Display',serif;font-size:24px;color:#fff;line-height:1.3;margin-bottom:18px;}
+.mhead-pills{display:flex;flex-wrap:wrap;gap:12px;}
+.mpill{font-size:12px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:5px;}
+.mpill strong{color:var(--gold2);}
+.mclose{position:absolute;top:18px;right:20px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.mbody{padding:32px 36px;}
+.msec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.msec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.mblock{background:#f8f9fb;border-radius:10px;padding:18px 20px;font-size:14px;line-height:1.75;color:var(--text);margin-bottom:28px;white-space:pre-wrap;}
+.mdetail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;}
+.mdetail-box{background:#f8f9fb;border-radius:10px;padding:14px 16px;}
+.mdetail-box label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);display:block;margin-bottom:4px;}
+.mdetail-box span{font-size:14px;font-weight:500;color:var(--text);}
+.mdetail-box.hl span{font-size:17px;font-weight:700;color:var(--navy);}
+.dates-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px;}
+.date-box{background:#f8f9fb;border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:3px;}
+.date-box label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);}
+.date-box span{font-size:13px;font-weight:600;color:var(--text);}
+.date-box.deadline{background:var(--gold-light);border:1px solid rgba(201,168,76,0.35);}
+.date-box.deadline span{color:#a06b00;}
+.docs-list{display:flex;flex-direction:column;gap:10px;margin-bottom:8px;}
+.doc-row{display:flex;align-items:center;gap:14px;background:#f8f9fb;border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-decoration:none;transition:background 0.15s,border-color 0.15s;}
+.doc-row:hover{background:#eef1f8;border-color:var(--navy);}
+.doc-icon{width:38px;height:38px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
+.doc-info{flex:1;min-width:0;}
+.doc-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.doc-label{font-size:11px;color:var(--muted);margin-top:1px;}
+.doc-dl{flex-shrink:0;color:var(--gold);font-size:13px;font-weight:600;}
+@media(max-width:600px){.mdetail-grid,.dates-grid{grid-template-columns:1fr;}.mbody{padding:20px;}.mhead{padding:22px 20px 20px;}header{padding:0 16px;}main{padding:24px 16px;}}
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-emblem">📋</div>
+    <div class="gate-logo">Procura<span>Edge</span></div>
+    <div class="gate-tagline">Tender Portal · Restricted Access</div>
+    <label class="gate-label">Access Password</label>
+    <input class="gate-input" type="password" id="gateInput" placeholder="••••••••" autocomplete="off"/>
+    <button class="gate-btn" onclick="checkPw()">Enter Portal →</button>
+    <div class="gate-err" id="gateErr"></div>
+  </div>
+</div>
+<div id="portal" style="display:none">
+  <header>
+    <div class="h-logo"><div class="h-logo-dot"></div>Procura<span>Edge</span><span style="font-family:Inter;font-size:12px;color:var(--slate);font-weight:400;margin-left:4px">Tender Portal</span></div>
+    <div class="h-right" id="headerCount"></div>
+  </header>
+  <main>
+    <div class="section-header">
+      <h1>Active Tenders</h1>
+      <p>Click on any tender to view full details and download documents</p>
+    </div>
+    <div class="filters" id="filterBar">
+      <button class="fbtn active" onclick="setFilter('all',this)">All</button>
+    </div>
+    <div class="tender-grid" id="grid">
+      <div class="loading"><div class="spinner"></div>Loading tenders…</div>
+    </div>
+  </main>
+</div>
+<div class="modal-bg" id="modalBg" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="mhead">
+      <button class="mclose" onclick="closeModal()">✕</button>
+      <div class="mhead-tag" id="mTag"></div>
+      <div class="mhead-title" id="mTitle"></div>
+      <div class="mhead-pills" id="mPills"></div>
+    </div>
+    <div class="mbody" id="mBody"></div>
+  </div>
+</div>
+<script>
+const PORTAL_PW='procura2024';
+const API='';
+let tenders=[];
+document.getElementById('gateInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkPw();});
+function checkPw(){
+  if(document.getElementById('gateInput').value.trim()===PORTAL_PW){
+    document.getElementById('gate').style.display='none';
+    document.getElementById('portal').style.display='block';
+    loadTenders();
+  }else{
+    document.getElementById('gateErr').textContent='Incorrect password. Try again.';
+    document.getElementById('gateInput').value='';
+  }
+}
+async function loadTenders(){
+  try{
+    const r=await fetch(`${API}/api/tenders`);
+    tenders=await r.json();
+    buildFilters();render(tenders);
+    document.getElementById('headerCount').textContent=`${tenders.length} tender${tenders.length!==1?'s':''} listed`;
+  }catch(e){document.getElementById('grid').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><h3>Could not load tenders</h3></div>';}
+}
+function buildFilters(){
+  const sectors=[...new Set(tenders.map(t=>t.sector).filter(Boolean))];
+  const bar=document.getElementById('filterBar');
+  sectors.forEach(s=>{const b=document.createElement('button');b.className='fbtn';b.textContent=s;b.onclick=()=>setFilter(s,b);bar.appendChild(b);});
+}
+function setFilter(s,btn){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render(s==='all'?tenders:tenders.filter(t=>t.sector===s));
+}
+function sectorClass(s){const m={'Infrastructure':'st-infra','Health':'st-health','Education':'st-edu','IT':'st-it','Water & Sanitation':'st-water','Energy':'st-energy'};return m[s]||'st-other';}
+function bidStatus(d){
+  if(!d)return{label:'—',dotCls:'s-open',lblCls:'sl-open'};
+  const diff=(new Date(d)-new Date())/86400000;
+  if(diff<0)return{label:'Closed',dotCls:'s-closed',lblCls:'sl-closed'};
+  if(diff<=7)return{label:`${Math.ceil(diff)}d left`,dotCls:'s-soon',lblCls:'sl-soon'};
+  return{label:'Open',dotCls:'s-open',lblCls:'sl-open'};
+}
+function fmtDate(d){return d?new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';}
+function render(list){
+  const g=document.getElementById('grid');
+  if(!list.length){g.innerHTML='<div class="empty"><div class="empty-icon">📋</div><h3>No tenders found</h3></div>';return;}
+  g.innerHTML=list.map(t=>{
+    const st=bidStatus(t.bid_submission_deadline);
+    return`<div class="tcard" onclick="openModal(${t.id})">
+      <div class="tcard-accent"></div>
+      <div class="tcard-top">
+        <div class="tcard-meta-row">
+          <span class="sector-tag ${sectorClass(t.sector)}">${t.sector||'General'}</span>
+          <span><span class="status-dot ${st.dotCls}"></span><span class="status-label ${st.lblCls}">${st.label}</span></span>
+        </div>
+        <div class="tcard-title">${t.name}</div>
+        <div class="tcard-info">
+          <div class="tci"><label>Estimated Cost</label><span class="cost">${t.estimated_cost||'—'}</span></div>
+          <div class="tci"><label>Bid Deadline</label><span>${fmtDate(t.bid_submission_deadline)}</span></div>
+          <div class="tci"><label>Available From</label><span>${fmtDate(t.available_from)}</span></div>
+          <div class="tci"><label>Timeline</label><span>${t.timeline||'—'}</span></div>
+        </div>
+      </div>
+      <div class="tcard-footer">
+        <div class="tcard-loc">📍 ${t.location||'—'}</div>
+        <div class="view-btn">Details →</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openModal(id){
+  const t=tenders.find(x=>x.id==id);if(!t)return;
+  document.getElementById('mTag').innerHTML=`<span class="sector-tag ${sectorClass(t.sector)}">${t.sector||'General'}</span>`;
+  document.getElementById('mTitle').textContent=t.name;
+  document.getElementById('mPills').innerHTML=`<div class="mpill">📍 <strong>${t.location||'—'}</strong></div><div class="mpill">💰 <strong>${t.estimated_cost||'—'}</strong></div><div class="mpill">⏰ Bid closes: <strong>${fmtDate(t.bid_submission_deadline)}</strong></div>`;
+  const docs=[];
+  for(let i=1;i<=5;i++){if(t[`doc${i}_url`])docs.push({url:t[`doc${i}_url`],label:t[`doc${i}_label`]||`Document ${i}`,name:t[`doc${i}_name`]||`Document ${i}`});}
+  const docsHtml=docs.length?`<div class="msec-title">Tender Documents</div><div class="docs-list">${docs.map(d=>`<a class="doc-row" href="${d.url}" target="_blank"><div class="doc-icon">📄</div><div class="doc-info"><div class="doc-name">${d.name}</div><div class="doc-label">${d.label}</div></div><div class="doc-dl">↓ Download</div></a>`).join('')}</div>`:'';
+  document.getElementById('mBody').innerHTML=`
+    <div class="msec-title">Tender Summary</div><div class="mblock">${t.summary||'—'}</div>
+    <div class="msec-title">Scope of Works</div><div class="mblock">${t.scope_of_works||'—'}</div>
+    <div class="msec-title">Key Details</div>
+    <div class="mdetail-grid">
+      <div class="mdetail-box hl"><label>Estimated Cost</label><span>${t.estimated_cost||'—'}</span></div>
+      <div class="mdetail-box"><label>Project Timeline</label><span>${t.timeline||'—'}</span></div>
+      <div class="mdetail-box"><label>Location</label><span>${t.location||'—'}</span></div>
+    </div>
+    <div class="msec-title">Important Dates</div>
+    <div class="dates-grid">
+      <div class="date-box"><label>Available From</label><span>${fmtDate(t.available_from)}</span></div>
+      <div class="date-box deadline"><label>Bid Submission Deadline</label><span>${fmtDate(t.bid_submission_deadline)}</span></div>
+    </div>
+    <div class="msec-title">Eligibility Criteria</div><div class="mblock">${t.eligibility||'—'}</div>
+    ${docsHtml}`;
+  document.getElementById('modalBg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function bgClose(e){if(e.target===document.getElementById('modalBg'))closeModal();}
+function closeModal(){document.getElementById('modalBg').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+</script>
+</body>
+</html>
