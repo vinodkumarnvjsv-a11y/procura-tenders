@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin — Procura Edge</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0f1e38;--navy2:#162847;--navy3:#1e3460;--gold:#c9a84c;--gold2:#e8c96e;--bg:#f4f6fa;--card:#fff;--border:#e2e6ed;--text:#1a2436;--muted:#6b7a95;--green:#1a9e6e;--red:#d94f3d;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
+#loginWrap{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy),var(--navy3));display:flex;align-items:center;justify-content:center;z-index:1000;}
+.login-box{background:rgba(255,255,255,0.06);backdrop-filter:blur(12px);border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:48px 40px;width:100%;max-width:380px;text-align:center;}
+.login-logo{font-family:'DM Serif Display',serif;font-size:28px;color:#fff;}
+.login-logo span{color:var(--gold);}
+.login-sub{color:#8a9ab5;font-size:11px;text-transform:uppercase;letter-spacing:2px;margin:6px 0 32px;}
+.l-lbl{display:block;text-align:left;font-size:11px;font-weight:600;color:#8a9ab5;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+.l-inp{width:100%;padding:13px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:9px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:14px;letter-spacing:2px;}
+.l-inp:focus{border-color:var(--gold);}
+.l-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:14px;border:none;border-radius:9px;cursor:pointer;font-family:'Inter',sans-serif;}
+.l-err{margin-top:10px;color:#ff9090;font-size:13px;min-height:18px;}
+#app{display:none;}
+header{background:var(--navy);height:62px;display:flex;align-items:center;padding:0 28px;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,0.15);}
+.hlogo{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;}
+.hlogo span{color:var(--gold);}
+.hright{display:flex;gap:10px;align-items:center;}
+.hadmin{background:rgba(201,168,76,0.2);color:var(--gold);font-size:11px;padding:4px 10px;border-radius:4px;font-weight:700;letter-spacing:0.5px;}
+.h-logout{background:none;border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;}
+main{max-width:1200px;margin:0 auto;padding:32px 24px;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.page-h{font-family:'DM Serif Display',serif;font-size:26px;color:var(--navy);}
+.page-sub{color:var(--muted);font-size:13px;margin-top:2px;}
+.btn-add{background:var(--navy);color:#fff;border:none;padding:12px 22px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;}
+.twrap{background:#fff;border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead{background:#f8f9fb;}
+th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);border-bottom:1px solid var(--border);}
+td{padding:14px 16px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafbfc;}
+.td-name{font-weight:600;color:var(--text);max-width:260px;}
+.td-cost{font-weight:700;color:var(--navy);}
+.stag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;}
+.abtn{border:none;background:none;cursor:pointer;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;margin-right:4px;}
+.abtn-edit{color:var(--navy);background:#eef1f8;}
+.abtn-del{color:var(--red);background:#fdecea;}
+.empty-td{text-align:center;padding:60px!important;color:var(--muted);}
+.foverlay{position:fixed;inset:0;background:rgba(8,18,36,0.7);display:flex;align-items:flex-start;justify-content:center;z-index:600;padding:20px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.foverlay.open{opacity:1;pointer-events:all;}
+.fmodal{background:#fff;border-radius:18px;width:100%;max-width:800px;margin:auto;transform:translateY(20px);transition:transform 0.25s;}
+.foverlay.open .fmodal{transform:translateY(0);}
+.fhead{background:linear-gradient(135deg,var(--navy),var(--navy3));padding:24px 30px;border-radius:18px 18px 0 0;display:flex;justify-content:space-between;align-items:center;}
+.fhead-title{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;}
+.fclose{background:rgba(255,255,255,0.12);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.fbody{padding:30px;}
+.fsec{margin-bottom:28px;}
+.fsec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:18px;}
+.frow{display:grid;gap:16px;margin-bottom:16px;}
+.frow.c2{grid-template-columns:1fr 1fr;}
+.frow.c3{grid-template-columns:1fr 1fr 1fr;}
+.fg{display:flex;flex-direction:column;gap:6px;}
+.fg label{font-size:12px;font-weight:600;color:var(--muted);}
+.fg label .r{color:var(--red);}
+.fc{padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;transition:border-color 0.2s;background:#fff;width:100%;}
+.fc:focus{border-color:var(--navy);}
+textarea.fc{resize:vertical;min-height:96px;line-height:1.65;}
+select.fc{cursor:pointer;}
+.doc-slot{background:#f8f9fb;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;}
+.doc-slot-header{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.doc-slot-num{width:22px;height:22px;background:var(--navy);color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.file-zone{border:2px dashed var(--border);border-radius:8px;padding:18px;text-align:center;cursor:pointer;transition:border-color 0.2s;background:#fff;margin-top:8px;}
+.file-zone:hover{border-color:var(--gold);}
+.file-zone input{display:none;}
+.fz-icon{font-size:24px;margin-bottom:6px;}
+.fz-text{font-size:12px;color:var(--muted);}
+.fz-name{font-size:12px;font-weight:600;color:var(--green);margin-top:6px;}
+.fz-existing{font-size:11px;color:var(--muted);margin-top:4px;}
+.ffoot{padding:18px 30px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end;}
+.btn-cancel{background:#f0f1f3;color:var(--muted);border:none;padding:11px 22px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-save{background:var(--gold);color:var(--navy);border:none;padding:11px 30px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-save:disabled{opacity:0.55;cursor:not-allowed;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:12px 20px;border-radius:9px;font-size:14px;font-weight:500;z-index:9999;transform:translateY(70px);opacity:0;transition:all 0.3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{border-left:4px solid var(--green);}
+.toast.err{border-left:4px solid var(--red);}
+@media(max-width:640px){.frow.c2,.frow.c3{grid-template-columns:1fr;}.fbody{padding:18px;}}
+</style>
+</head>
+<body>
+<div id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">Procura<span>Edge</span></div>
+    <div class="login-sub">Admin Panel</div>
+    <label class="l-lbl">Admin Secret Key</label>
+    <input class="l-inp" type="password" id="adminKey" placeholder="••••••••"/>
+    <button class="l-btn" onclick="doLogin()">Login →</button>
+    <div class="l-err" id="loginErr"></div>
+  </div>
+</div>
+<div id="app">
+  <header>
+    <div class="hlogo">Procura<span>Edge</span></div>
+    <div class="hright"><span class="hadmin">ADMIN</span><button class="h-logout" onclick="doLogout()">Logout</button></div>
+  </header>
+  <main>
+    <div class="topbar">
+      <div><div class="page-h">Tender Management</div><div class="page-sub" id="adminSub">Loading…</div></div>
+      <button class="btn-add" onclick="openForm(null)">+ Add New Tender</button>
+    </div>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Tender Name</th><th>Sector</th><th>Estimated Cost</th><th>Bid Deadline</th><th>Location</th><th>Actions</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<div class="foverlay" id="foverlay">
+  <div class="fmodal">
+    <div class="fhead">
+      <div class="fhead-title" id="fheadTitle">Add New Tender</div>
+      <button class="fclose" onclick="closeForm()">✕</button>
+    </div>
+    <div class="fbody">
+      <input type="hidden" id="fId"/>
+      <div class="fsec">
+        <div class="fsec-title">Basic Information</div>
+        <div class="frow"><div class="fg"><label>Tender Name <span class="r">*</span></label><input class="fc" id="fName" placeholder="e.g. Construction of District Hospital"/></div></div>
+        <div class="frow c2">
+          <div class="fg"><label>Sector <span class="r">*</span></label><select class="fc" id="fSector"><option value="">— Select —</option><option>Infrastructure</option><option>Health</option><option>Education</option><option>IT</option><option>Water &amp; Sanitation</option><option>Energy</option><option>Transport</option><option>Agriculture</option><option>Other</option></select></div>
+          <div class="fg"><label>Location <span class="r">*</span></label><input class="fc" id="fLocation" placeholder="e.g. Vijayawada, AP"/></div>
+        </div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-title">Tender Summary</div>
+        <div class="frow"><div class="fg"><label>Summary <span class="r">*</span></label><textarea class="fc" id="fSummary" style="min-height:80px" placeholder="Brief overview — 2 to 4 sentences"></textarea></div></div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-title">Scope of Works</div>
+        <div class="frow"><div class="fg"><label>Scope of Works <span class="r">*</span></label><textarea class="fc" id="fScope" style="min-height:120px" placeholder="Detailed description of work involved"></textarea></div></div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-title">Cost &amp; Timeline</div>
+        <div class="frow c2">
+          <div class="fg"><label>Estimated Cost <span class="r">*</span></label><input class="fc" id="fCost" placeholder="e.g. ₹ 3.75 Crore"/></div>
+          <div class="fg"><label>Project Timeline <span class="r">*</span></label><input class="fc" id="fTimeline" placeholder="e.g. 18 months from award"/></div>
+        </div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-title">Important Dates</div>
+        <div class="frow c2">
+          <div class="fg"><label>Tender Available From <span class="r">*</span></label><input class="fc" type="date" id="fAvailFrom"/></div>
+          <div class="fg"><label>Bid Submission Deadline <span class="r">*</span></label><input class="fc" type="date" id="fBidDeadline"/></div>
+        </div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-title">Eligibility Criteria</div>
+        <div class="frow"><div class="fg"><label>Eligibility <span class="r">*</span></label><textarea class="fc" id="fEligibility" style="min-height:96px" placeholder="Minimum turnover, experience, certifications etc."></textarea></div></div>
+      </div>
+      <div class="fsec">
+        <div class="fsec-title">Tender Documents (up to 5)</div>
+        <div id="docSlots"></div>
+      </div>
+    </div>
+    <div class="ffoot">
+      <button class="btn-cancel" onclick="closeForm()">Cancel</button>
+      <button class="btn-save" id="saveBtn" onclick="saveTender()">Save Tender</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API='';
+let adminKey='';
+let tenders=[];
+let editingId=null;
+const docState={1:{},2:{},3:{},4:{},5:{}};
+function buildDocSlots(){
+  const labels=['Tender Notice / NIT','Bid Document / BOQ','Drawing / Specification','Pre-Qualification Criteria','Any Other Document'];
+  let html='';
+  for(let i=1;i<=5;i++){
+    html+=`<div class="doc-slot"><div class="doc-slot-header"><div class="doc-slot-num">${i}</div> Document ${i}</div>
+    <div class="frow c2">
+      <div class="fg"><label>Document Label</label><input class="fc" id="docLabel${i}" placeholder="${labels[i-1]}"/></div>
+      <div class="fg"><label>Display Name</label><input class="fc" id="docDispName${i}" placeholder="filename.pdf"/></div>
+    </div>
+    <div class="file-zone" onclick="document.getElementById('docFile${i}').click()">
+      <input type="file" id="docFile${i}" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip" onchange="uploadDoc(${i},this)"/>
+      <div class="fz-icon">📎</div><div class="fz-text">Click to upload (PDF, DOC, XLS, ZIP)</div>
+      <div class="fz-name" id="docStatus${i}"></div>
+      <div class="fz-existing" id="docExisting${i}"></div>
+    </div></div>`;
+  }
+  document.getElementById('docSlots').innerHTML=html;
+}
+buildDocSlots();
+document.getElementById('adminKey').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+function doLogin(){
+  const k=document.getElementById('adminKey').value.trim();
+  if(!k){document.getElementById('loginErr').textContent='Enter your admin key.';return;}
+  adminKey=k;
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('app').style.display='block';
+  loadTenders();
+}
+function doLogout(){adminKey='';document.getElementById('loginWrap').style.display='flex';document.getElementById('app').style.display='none';}
+async function loadTenders(){
+  try{
+    const r=await fetch(`${API}/api/tenders`);
+    tenders=await r.json();
+    document.getElementById('adminSub').textContent=`${tenders.length} tender${tenders.length!==1?'s':''} in database`;
+    renderTable();
+  }catch(e){toast('Failed to load','err');}
+}
+function fmtDate(d){return d?new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';}
+function sectorStyle(s){const m={'Infrastructure':'background:#e8f0fe;color:#1a56db','Health':'background:#e8faf0;color:#1a7a4a','Education':'background:#fff8e8;color:#a06b00','IT':'background:#f3e8ff;color:#7c3aed'};return m[s]||'background:#f0f0f0;color:#555';}
+function renderTable(){
+  const tb=document.getElementById('tbody');
+  if(!tenders.length){tb.innerHTML='<tr><td colspan="6" class="empty-td">No tenders yet. Click "Add New Tender" to begin.</td></tr>';return;}
+  tb.innerHTML=tenders.map(t=>`<tr>
+    <td class="td-name">${t.name}</td>
+    <td><span class="stag" style="${sectorStyle(t.sector)}">${t.sector||'—'}</span></td>
+    <td class="td-cost">${t.estimated_cost||'—'}</td>
+    <td>${fmtDate(t.bid_submission_deadline)}</td>
+    <td>${t.location||'—'}</td>
+    <td style="white-space:nowrap">
+      <button class="abtn abtn-edit" onclick="openForm(${t.id})">✏️ Edit</button>
+      <button class="abtn abtn-del" onclick="deleteTender(${t.id})">🗑 Delete</button>
+    </td></tr>`).join('');
+}
+function openForm(id){
+  editingId=id||null;
+  document.getElementById('fheadTitle').textContent=id?'Edit Tender':'Add New Tender';
+  clearForm();
+  if(id){const t=tenders.find(x=>x.id==id);if(t)populateForm(t);}
+  document.getElementById('foverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeForm(){document.getElementById('foverlay').classList.remove('open');document.body.style.overflow='';}
+function clearForm(){
+  ['fId','fName','fLocation','fSummary','fScope','fCost','fTimeline','fAvailFrom','fBidDeadline','fEligibility'].forEach(i=>{document.getElementById(i).value='';});
+  document.getElementById('fSector').value='';
+  for(let i=1;i<=5;i++){document.getElementById(`docLabel${i}`).value='';document.getElementById(`docDispName${i}`).value='';document.getElementById(`docStatus${i}`).textContent='';document.getElementById(`docExisting${i}`).textContent='';docState[i]={};}
+}
+function populateForm(t){
+  document.getElementById('fId').value=t.id;
+  document.getElementById('fName').value=t.name||'';
+  document.getElementById('fSector').value=t.sector||'';
+  document.getElementById('fLocation').value=t.location||'';
+  document.getElementById('fSummary').value=t.summary||'';
+  document.getElementById('fScope').value=t.scope_of_works||'';
+  document.getElementById('fCost').value=t.estimated_cost||'';
+  document.getElementById('fTimeline').value=t.timeline||'';
+  document.getElementById('fAvailFrom').value=t.available_from||'';
+  document.getElementById('fBidDeadline').value=t.bid_submission_deadline||'';
+  document.getElementById('fEligibility').value=t.eligibility||'';
+  for(let i=1;i<=5;i++){
+    document.getElementById(`docLabel${i}`).value=t[`doc${i}_label`]||'';
+    document.getElementById(`docDispName${i}`).value=t[`doc${i}_name`]||'';
+    if(t[`doc${i}_url`]){docState[i]={url:t[`doc${i}_url`],name:t[`doc${i}_name`]||''};document.getElementById(`docExisting${i}`).textContent=`✅ Existing: ${t[`doc${i}_name`]||'document'}`;}
+  }
+}
+async function uploadDoc(slot,input){
+  const file=input.files[0];if(!file)return;
+  const statusEl=document.getElementById(`docStatus${slot}`);
+  statusEl.textContent=`⏳ Uploading ${file.name}…`;
+  const fd=new FormData();fd.append('file',file);
+  try{
+    const r=await fetch(`${API}/api/upload`,{method:'POST',headers:{'Authorization':`Bearer ${adminKey}`},body:fd});
+    const d=await r.json();
+    if(d.url){docState[slot]={url:d.url,name:d.name||file.name};statusEl.textContent=`✅ ${file.name} uploaded`;if(!document.getElementById(`docDispName${slot}`).value)document.getElementById(`docDispName${slot}`).value=file.name;}
+    else statusEl.textContent=`❌ Upload failed: ${d.error}`;
+  }catch(e){statusEl.textContent='❌ Upload error';}
+}
+async function saveTender(){
+  const name=document.getElementById('fName').value.trim();
+  const sector=document.getElementById('fSector').value;
+  const location=document.getElementById('fLocation').value.trim();
+  const summary=document.getElementById('fSummary').value.trim();
+  const scope=document.getElementById('fScope').value.trim();
+  const cost=document.getElementById('fCost').value.trim();
+  const timeline=document.getElementById('fTimeline').value.trim();
+  const availFrom=document.getElementById('fAvailFrom').value;
+  const bidDeadline=document.getElementById('fBidDeadline').value;
+  const eligibility=document.getElementById('fEligibility').value.trim();
+  if(!name||!sector||!location||!summary||!scope||!cost||!timeline||!availFrom||!bidDeadline||!eligibility){toast('Please fill all required (*) fields','err');return;}
+  const payload={name,sector,location,summary,scope_of_works:scope,estimated_cost:cost,timeline,available_from:availFrom,bid_submission_deadline:bidDeadline,eligibility};
+  for(let i=1;i<=5;i++){payload[`doc${i}_label`]=document.getElementById(`docLabel${i}`).value.trim()||null;payload[`doc${i}_name`]=document.getElementById(`docDispName${i}`).value.trim()||null;payload[`doc${i}_url`]=docState[i].url||null;}
+  const btn=document.getElementById('saveBtn');btn.disabled=true;btn.textContent='Saving…';
+  try{
+    const method=editingId?'PUT':'POST';
+    if(editingId)payload.id=editingId;
+    const r=await fetch(`${API}/api/tenders`,{method,headers:{'Content-Type':'application/json','Authorization':`Bearer ${adminKey}`},body:JSON.stringify(payload)});
+    if(r.ok){toast(editingId?'Tender updated ✓':'Tender added ✓','ok');closeForm();await loadTenders();}
+    else{const e=await r.json();toast(`Error: ${e.error}`,'err');}
+  }catch(e){toast('Network error','err');}
+  btn.disabled=false;btn.textContent='Save Tender';
+}
+async function deleteTender(id){
+  if(!confirm('Delete this tender? Cannot be undone.'))return;
+  const r=await fetch(`${API}/api/tenders`,{method:'DELETE',headers:{'Content-Type':'application/json','Authorization':`Bearer ${adminKey}`},body:JSON.stringify({id})});
+  if(r.ok){toast('Deleted','ok');await loadTenders();}else toast('Delete failed','err');
+}
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3000);}
+document.getElementById('foverlay').addEventListener('click',e=>{if(e.target===document.getElementById('foverlay'))closeForm();});
+</script>
+</body>
+</html>
